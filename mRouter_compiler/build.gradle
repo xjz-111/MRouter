@@ -1,0 +1,13 @@
+apply plugin: 'java-library'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    annotationProcessor 'com.google.auto.service:auto-service:1.0-rc7'
+    compileOnly 'com.google.auto.service:auto-service-annotations:1.0-rc7'
+    implementation 'com.squareup:javapoet:1.13.0'
+
+    implementation project(path: ':mRouter_annotation')
+}
+
+sourceCompatibility = "7"
+targetCompatibility = "7"

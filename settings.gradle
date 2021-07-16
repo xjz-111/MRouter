@@ -1,0 +1,7 @@
+rootProject.name='MRouter'
+include ':app'
+include ':mRouter_compiler'
+include ':mRouter_annotation'
+include ':mRouter_api'
+include ':test_module1'
+include ':test_module2'
