@@ -48,7 +48,7 @@ MRouter.getInstance().build("app/activity2")
             .navigation(this, 123, params -> Log.i("MRouter", "跳转成功：" + params.getPath()));
 
 // 获取Fragment
-Fragment fragment = (Fragment)MRouter.getInstance().build("module1/fragment1").navigationInstance();
+Fragment fragment = MRouter.getInstance().build("app/fragment1").navigation();
 
 // 参数
 @AutoValue(key = "key")
