@@ -52,7 +52,7 @@ class Navigation {
         return instance;
     }
 
-    Object navigation(final Context context, @NonNull final Params params, final int requestCode, final MRouterCallback callback) {
+    <T> T navigation(final Context context, @NonNull final Params params, final int requestCode, final MRouterCallback callback) {
         MRouterInterceptor interceptor = params.getInterceptor();
         if (null != interceptor){
             Params iParams = interceptor.getRouter();
@@ -65,24 +65,26 @@ class Navigation {
         }
     }
 
-    private Object parse(Context context, Params params, int requestCode, MRouterCallback callback){
+    private <T> T parse(Context context, Params params, int requestCode, MRouterCallback callback){
         String[] result = Utils.getPath(params.getGroup(), params.getPath());
-        Map<String, RouterMeta> routers = _MRouter.getInstance().getRouters();
-        Map<String, RouterMeta> jsons = _MRouter.getInstance().getSerializations();
-        RouterMeta meta = routers.get(result[1]);
-        if (null == meta){
-            meta = jsons.get(result[1]);
-        }
-        if (null != meta){
-            params.setGroup(result[0]);
-            params.setPath(result[1]);
-            params.setDestination(meta.getDestination());
-            params.setType(meta.getType());
+        if (null != result) {
+            Map<String, RouterMeta> routers = _MRouter.getInstance().getRouters();
+            Map<String, RouterMeta> jsons = _MRouter.getInstance().getSerializations();
+            RouterMeta meta = routers.get(result[1]);
+            if (null == meta){
+                meta = jsons.get(result[1]);
+            }
+            if (null != meta){
+                params.setGroup(result[0]);
+                params.setPath(result[1]);
+                params.setDestination(meta.getDestination());
+                params.setType(meta.getType());
+            }
         }
         return _go(context, params, requestCode, callback);
     }
 
-    Object _go(final Context context, @NonNull final Params params, final int requestCode, final MRouterCallback callback){
+    <T> T _go(final Context context, @NonNull final Params params, final int requestCode, final MRouterCallback callback){
         final Context currentContext = null == context ? Navigation.context : context;
         switch (params.getType()) {
             case TYPE_ACTIVITY:
@@ -113,9 +115,9 @@ class Navigation {
 
                 break;
             case TYPE_FTAGMENT:
-                Class fragmentMeta = params.getDestination();
+                Class fragmentClss = params.getDestination();
                 try {
-                    Object instance = fragmentMeta.getConstructor().newInstance();
+                    T instance = (T) fragmentClss.getConstructor().newInstance();
                     if (instance instanceof Fragment) {
                         ((Fragment) instance).setArguments(params.getExtras());
                     } else if (instance instanceof androidx.fragment.app.Fragment) {
@@ -129,11 +131,19 @@ class Navigation {
             case TYPE_JSON:
                 try {
                     Class serialization = params.getDestination();
-                    return serialization.getConstructor().newInstance();
+                    return (T) serialization.getConstructor().newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             default:
+                Class aClass = params.getDestination();
+                if (null != aClass) {
+                    try {
+                        return (T) aClass.getConstructor().newInstance();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
                 return null;
         }
 

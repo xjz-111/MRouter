@@ -7,6 +7,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.leslie.mrouter_annotation.Router;
 import com.leslie.mrouter_api.MRouter;
@@ -24,6 +25,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn2).setOnClickListener(this);
         findViewById(R.id.btn3).setOnClickListener(this);
         findViewById(R.id.btn4).setOnClickListener(this);
+
+        Fragment testFragment = MRouter.getInstance().build("app/fragment1").navigation();
     }
 
     @Override
@@ -54,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     .withParcelable("parcelable", new TestParcel(21, "hhhhhhh"))
                     .withSerializable("serializable", new TestSerializable(77, "bncbznmcb"))
                     .withObject("obj", new SimpleBean())
-                    .with(bundle)
                     .navigation(this, 123, params -> Log.i("xjzhao", "跳转成功：" + params.getPath()));
         } else if (id == R.id.btn3){
             MRouter.getInstance().build("module1/main")

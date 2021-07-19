@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityOptionsCompat;
 
 import com.leslie.mrouter_annotation.RouterMeta;
+import com.leslie.mrouter_annotation.RouterType;
 import com.leslie.mrouter_api.utils.DefaultPoolExecutor;
 
 import java.io.Serializable;
@@ -234,7 +235,7 @@ public class Params extends RouterMeta implements IParams{
     @Override
     public Params withObject(@NonNull String key, @NonNull Object obj) {
         if (null == serializationUtils){
-            serializationUtils = navigationInstance(ISerialization.class);
+            serializationUtils = navigation(ISerialization.class);
         }
         bundle.putString(key, serializationUtils.object2Json(obj));
         return this;
@@ -267,46 +268,51 @@ public class Params extends RouterMeta implements IParams{
         return this;
     }
 
-    public void navigation(){
-        _navigation(null, -1, null);
+    public <T> T navigation(){
+        return _navigation(null, -1, null);
     }
 
-    public void navigation(@NonNull Activity activity){
-        _navigation(activity, -1, null);
+    public <T> T navigation(@NonNull Activity activity){
+        return _navigation(activity, -1, null);
     }
 
-    public void navigation(@NonNull Activity activity, int requestCode){
-        _navigation(activity, requestCode, null);
+    public <T> T navigation(@NonNull Activity activity, int requestCode){
+        return  _navigation(activity, requestCode, null);
     }
 
-    public void navigation(int requestCode){
-        _navigation(null, requestCode, null);
+    public <T> T navigation(int requestCode){
+        return _navigation(null, requestCode, null);
     }
 
-    public void navigation(MRouterCallback callback){
-        _navigation(null, -1, callback);
+    public <T> T navigation(MRouterCallback callback){
+        return _navigation(null, -1, callback);
     }
 
-    public void navigation(@NonNull Activity activity, MRouterCallback callback){
-        _navigation(activity, -1, callback);
+    public <T> T navigation(@NonNull Activity activity, MRouterCallback callback){
+        return _navigation(activity, -1, callback);
     }
 
-    public void navigation(@NonNull Activity activity, int requestCode, MRouterCallback callback){
-        _navigation(activity, requestCode, callback);
+    public <T> T navigation(@NonNull Activity activity, int requestCode, MRouterCallback callback){
+        return _navigation(activity, requestCode, callback);
     }
 
-    public void navigation(int requestCode, MRouterCallback callback){
-        _navigation(null, requestCode, callback);
+    public <T> T navigation(int requestCode, MRouterCallback callback){
+        return _navigation(null, requestCode, callback);
     }
 
-    private void _navigation(final Context context, final int requestCode, final MRouterCallback callback){
+    private <T> T _navigation(final Context context, final int requestCode, final MRouterCallback callback){
 
-        DefaultPoolExecutor.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                Navigation.getInstance().navigation(context, Params.this, requestCode, callback);
-            }
-        });
+        if (getType() == RouterType.TYPE_ACTIVITY) {
+            DefaultPoolExecutor.getInstance().execute(new Runnable() {
+                @Override
+                public void run() {
+                    Navigation.getInstance().navigation(context, Params.this, requestCode, callback);
+                }
+            });
+        }else {
+            Navigation.getInstance().navigation(context, Params.this, requestCode, callback);
+        }
+        return null;
     }
 
     /**
@@ -315,7 +321,7 @@ public class Params extends RouterMeta implements IParams{
      * @param <T>
      * @return
      */
-    public <T> T navigationInstance(@NonNull Class<? extends T> cls) {
+    public <T> T navigation(@NonNull Class<? extends T> cls) {
         setDestination(cls);
         try {
             RouterMeta meta;
@@ -325,32 +331,6 @@ public class Params extends RouterMeta implements IParams{
             if (null == meta){
                 Map<String, RouterMeta> routers =_MRouter.getInstance().getRouters();
                 meta = routers.get(cls.getCanonicalName());
-            }
-
-            if (null != meta){
-                return (T) meta.getDestination().newInstance();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    /**
-     * 根据path获取对象
-     * @param <T>
-     * @return
-     */
-    public <T> T navigationInstance() {
-        try {
-            RouterMeta meta;
-            Map<String, RouterMeta> serializations =_MRouter.getInstance().getSerializations();
-            meta = serializations.get(getPath());
-
-            if (null == meta){
-                Map<String, RouterMeta> routers =_MRouter.getInstance().getRouters();
-                meta = routers.get(getPath());
             }
 
             if (null != meta){
