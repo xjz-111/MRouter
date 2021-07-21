@@ -50,7 +50,6 @@ public class MRouter {
         return new Params(group, path);
     }
 
-    @Deprecated
     public Params build(){
         return new Params(null, null);
     }
