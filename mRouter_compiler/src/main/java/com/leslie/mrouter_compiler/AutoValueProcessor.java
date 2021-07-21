@@ -36,6 +36,8 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import static com.leslie.mrouter_annotation.Constant.FILE_NAME_AUTOVALUE;
+
 /**
  * 跳转自动传参自动获取
  * <p>
@@ -84,7 +86,7 @@ public class AutoValueProcessor extends AbstractProcessor {
         if (null == moduleName || "".equals(moduleName)) {
             throw new AssertionError(Constant.NO_MODULE_NAME_TIPS);
         }
-        print("AutoValueProcessor::************* 开启处理AutoValue相关注解 *************");
+        print("************* 开启处理AutoValue相关注解 *************");
     }
 
     @Override
@@ -129,6 +131,7 @@ public class AutoValueProcessor extends AbstractProcessor {
             injectMethodBuilder.addStatement("$T instance = ($T)target", clsName, clsName);
 
             TypeMirror currentType = parent.asType();
+
             for (Element element : children) {
                 AutoValue fieldConfig = element.getAnnotation(AutoValue.class);
                 String fieldName = element.getSimpleName().toString();
@@ -161,7 +164,7 @@ public class AutoValueProcessor extends AbstractProcessor {
             }
 
             // 类
-            TypeSpec typeSpec = TypeSpec.classBuilder(parent.getSimpleName() + com.leslie.mrouter_annotation.Constant.FILE_NAME_AUTOVALUE)
+            TypeSpec typeSpec = TypeSpec.classBuilder(parent.getSimpleName() + FILE_NAME_AUTOVALUE)
                     .addSuperinterface(IInject.class)
                     .addModifiers(Modifier.PUBLIC)
                     .addMethod(injectMethodBuilder.build())
@@ -175,11 +178,11 @@ public class AutoValueProcessor extends AbstractProcessor {
                 // write to file
                 javaFile.writeTo(filer);
 
-                messager.printMessage(Diagnostic.Kind.NOTE, "MRouter::代码已生成！");
+                print("代码已生成！");
 
             } catch (IOException e) {
                 e.printStackTrace();
-                messager.printMessage(Diagnostic.Kind.NOTE, "MRouter::生成代码失败");
+                print("生成代码失败");
 
             }
         }
@@ -258,6 +261,6 @@ public class AutoValueProcessor extends AbstractProcessor {
 
 
     private void print(String s){
-        messager.printMessage(Diagnostic.Kind.NOTE, s);
+        messager.printMessage(Diagnostic.Kind.NOTE, "MRouter::AutoValue::" + s);
     }
 }
