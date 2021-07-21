@@ -1,6 +1,7 @@
 package com.leslie.mrouter_api;
 
 import android.app.Application;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 
@@ -27,13 +28,16 @@ public class MRouter {
     }
 
     public void init(@NonNull final Application application){
-        DefaultPoolExecutor.getInstance().execute(new Runnable() {
-            @Override
-            public void run() {
-                _MRouter.getInstance().init(application);
-            }
-        });
-
+        if ( Looper.getMainLooper().getThread() == Thread.currentThread()){
+            DefaultPoolExecutor.getInstance().execute(new Runnable() {
+                @Override
+                public void run() {
+                    _MRouter.getInstance().init(application);
+                }
+            });
+        }else {
+            _MRouter.getInstance().init(application);
+        }
     }
 
 
