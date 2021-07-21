@@ -1,7 +1,6 @@
 package com.leslie.mrouter;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -10,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.leslie.mrouter_annotation.AutoValue;
 import com.leslie.mrouter_annotation.Router;
 import com.leslie.mrouter_api.MRouter;
+import com.leslie.mrouter_api.utils.logger;
 
 /**
  * 作者：xjzhao
@@ -31,6 +31,6 @@ public class Activity1 extends AppCompatActivity {
         textView.setText(this.getClass().getSimpleName());
         setContentView(textView);
         MRouter.getInstance().inject(this);
-        Log.i("xjzhao", "name : " + name);
+        logger.info("name : " + name);
     }
 }

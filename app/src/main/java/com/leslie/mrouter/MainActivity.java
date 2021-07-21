@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import com.leslie.mrouter.test.TestBean;
 import com.leslie.mrouter_annotation.Router;
 import com.leslie.mrouter_api.MRouter;
+import com.leslie.mrouter_api.utils.logger;
 
 import java.util.ArrayList;
 
@@ -36,8 +37,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Fragment testFragment1 = MRouter.getInstance().build().navigation(Fragment1.class);
                 TestBean testBean1 = MRouter.getInstance().build().navigation(TestBean.class);
 
-                Log.i("xjzhao", "testFragment : " + testFragment + "  testBean : " + testBean);
-                Log.i("xjzhao", "testFragment1 : " + testFragment1 + "  testBean1 : " + testBean1);
+                logger.info("testFragment : " + testFragment + "  testBean : " + testBean);
+                logger.info("testFragment1 : " + testFragment1 + "  testBean1 : " + testBean1);
                 break;
             }
         }
