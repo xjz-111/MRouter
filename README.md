@@ -22,7 +22,7 @@
 ```java
 // debug状态时每次运行都会重新扫描自动生成的文件 - 否则会使用扫描缓存
 MRouter.getInstance().isDebug(BuildConfig.DEBUG);
-// 初始化 - 线程中处理的
+// 初始化 - 在主线程中调用时内部会自动切换到子线程中处理；在子线程中调用，内部不在启动线程，在当前线程中处理。
 MRouter.getInstance().init(this);
 ```
 * 使用；
