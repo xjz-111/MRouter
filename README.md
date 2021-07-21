@@ -146,19 +146,19 @@ public class LoginActivityInterceptor extends MRouterInterceptor {
 }
 ```
 #### 四. 生成代码
-* _MRouter$$Json$${moduleName}.class
+* _MRouter$$Json$${moduleName}
 ```xml
 每个module仅生成一个，Json处理的类，定义多个使用时也仅获取第一个。位置：com.leslie.android.mrouter.json
 ```
-* _MRouter$$Instance$${moduleName}.class
+* _MRouter$$Instance$${moduleName}
 ```xml
 每个module仅生成一个，存放被@Router注解的非Activity，Fragment，ISerialization的相关信息。位置：com.leslie.android.mrouter.instance
 ```
-* _MRouter$$Router$${moduleName}.class
+* _MRouter$$Router$${moduleName}
 ```xml
 每个module仅生成一个，存放被@Router注解的Fragment和Activity相关信息。位置：com.leslie.android.mrouter.router
 ```
-* {ClassSimpleName}$$AutoValue.clss
+* {ClassSimpleName}$$AutoValue
 ```xml
 有被@AutoValue注解变量的类，都会对应生成一个java文件，其包名路径和注解所在相同，这样被注解的变量才能使用friendly修饰符
 ```
