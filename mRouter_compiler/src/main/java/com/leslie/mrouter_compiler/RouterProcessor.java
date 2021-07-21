@@ -154,13 +154,13 @@ public class RouterProcessor extends AbstractProcessor {
             }
         }
 
-        // _MRouter$$Json$${moduleName}.class
+        // _MRouter$$Json$${moduleName}
         if (isIntNumberNBitONEInBinary(temp, 1)) generate(GENERATE_PACKAGER + "." + JSON_PACKAGE_SUFFIX, JSON_FILE_NAME_START + moduleName, IJson.class, jsonMb.build());
 
-        // _MRouter$$Instance$${moduleName}.class
+        // _MRouter$$Instance$${moduleName}
         if (isIntNumberNBitONEInBinary(temp, 2)) generate(GENERATE_PACKAGER + "." + INSTANCE_PACKAGE_SUFFIX, INSTANCE_FILE_NAME_START + moduleName, IInstance.class, instanceMb.build());
 
-        // _MRouter$$Router$${moduleName}.class
+        // _MRouter$$Router$${moduleName}
         if (isIntNumberNBitONEInBinary(temp, 3)) generate(GENERATE_PACKAGER + "." + ROUTER_PACKAGE_SUFFIX, FILE_NAME_START + moduleName, IRouter.class, routerMb.build());
 
     }
