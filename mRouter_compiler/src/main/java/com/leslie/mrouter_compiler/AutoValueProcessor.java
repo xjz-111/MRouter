@@ -113,7 +113,7 @@ public class AutoValueProcessor extends AbstractProcessor {
             List<Element> children = entry.getValue();
 
             String qualifiedName = parent.getQualifiedName().toString();
-            // 必须使用相同包名，否则智能将变量申明为public的
+            // 必须使用相同包名，否则必须将变量申明为public的
             String packageName = qualifiedName.substring(0, qualifiedName.lastIndexOf("."));
             ClassName clsName = ClassName.get(parent);
 
@@ -124,7 +124,7 @@ public class AutoValueProcessor extends AbstractProcessor {
                     .addParameter(ParameterSpec.builder(TypeName.OBJECT, "target").build());
 
 
-            injectMethodBuilder.addStatement("ISerialization serializationUtils = $T.getInstance().build().navigationInstance($T.class)", ClassName.get(Constant.API_PACKAGE, "MRouter"), ClassName.get(jsonType));
+            injectMethodBuilder.addStatement("ISerialization serializationUtils = $T.getInstance().build().navigation($T.class)", ClassName.get(Constant.API_PACKAGE, "MRouter"), ClassName.get(jsonType));
 
             injectMethodBuilder.addStatement("$T instance = ($T)target", clsName, clsName);
 

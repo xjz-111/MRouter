@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.leslie.mrouter.test.TestBean;
 import com.leslie.mrouter_annotation.Router;
 import com.leslie.mrouter_api.MRouter;
 
@@ -26,7 +27,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn3).setOnClickListener(this);
         findViewById(R.id.btn4).setOnClickListener(this);
 
-        Fragment testFragment = MRouter.getInstance().build("app/fragment1").navigation();
+
+        while (true){
+            if (MRouter.getInstance().isInitSuccess()) {
+                Fragment testFragment = MRouter.getInstance().build("app/fragment1").navigation();
+                TestBean testBean = MRouter.getInstance().build("app/testBean").navigation();
+
+                Fragment testFragment1 = MRouter.getInstance().build().navigation(Fragment1.class);
+                TestBean testBean1 = MRouter.getInstance().build().navigation(TestBean.class);
+
+                Log.i("xjzhao", "testFragment : " + testFragment + "  testBean : " + testBean);
+                Log.i("xjzhao", "testFragment1 : " + testFragment1 + "  testBean1 : " + testBean1);
+                break;
+            }
+        }
     }
 
     @Override

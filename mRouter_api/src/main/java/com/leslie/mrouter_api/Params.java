@@ -10,12 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityOptionsCompat;
 
 import com.leslie.mrouter_annotation.RouterMeta;
-import com.leslie.mrouter_annotation.RouterType;
-import com.leslie.mrouter_api.utils.DefaultPoolExecutor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * 作者：xjzhao
@@ -301,18 +298,7 @@ public class Params extends RouterMeta implements IParams{
     }
 
     private <T> T _navigation(final Context context, final int requestCode, final MRouterCallback callback){
-
-        if (getType() == RouterType.TYPE_ACTIVITY) {
-            DefaultPoolExecutor.getInstance().execute(new Runnable() {
-                @Override
-                public void run() {
-                    Navigation.getInstance().navigation(context, Params.this, requestCode, callback);
-                }
-            });
-        }else {
-            Navigation.getInstance().navigation(context, Params.this, requestCode, callback);
-        }
-        return null;
+        return Navigation.getInstance().navigation(context, this, requestCode, callback);
     }
 
     /**
@@ -324,15 +310,7 @@ public class Params extends RouterMeta implements IParams{
     public <T> T navigation(@NonNull Class<? extends T> cls) {
         setDestination(cls);
         try {
-            RouterMeta meta;
-            Map<String, RouterMeta> serializations =_MRouter.getInstance().getSerializations();
-            meta = serializations.get(cls.getCanonicalName());
-
-            if (null == meta){
-                Map<String, RouterMeta> routers =_MRouter.getInstance().getRouters();
-                meta = routers.get(cls.getCanonicalName());
-            }
-
+            RouterMeta meta = _MRouter.getInstance().getRouterMeta(cls);
             if (null != meta){
                 return (T) meta.getDestination().newInstance();
             }
@@ -341,4 +319,6 @@ public class Params extends RouterMeta implements IParams{
         }
         return null;
     }
+
+
 }

@@ -58,4 +58,8 @@ public class MRouter {
     public void inject(@NonNull Object target) {
         _MRouter.getInstance().inject(target);
     }
+
+    public boolean isInitSuccess(){
+        return _MRouter.getInstance().isInitSuccess();
+    }
 }

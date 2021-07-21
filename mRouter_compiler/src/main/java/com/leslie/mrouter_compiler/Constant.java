@@ -41,6 +41,7 @@ class Constant {
     static final String FRAGMENT_V4 = "android.support.v4.app.Fragment";
     static final String JSON_TYPE = API_PACKAGE + ".ISerialization";
 
+
     // Java type
     private static final String LANG = "java.lang";
     static final String BYTE = LANG + ".Byte";

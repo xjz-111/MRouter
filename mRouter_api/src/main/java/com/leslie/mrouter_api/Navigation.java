@@ -13,9 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
 import com.leslie.mrouter_annotation.RouterMeta;
+import com.leslie.mrouter_annotation.RouterType;
 import com.leslie.mrouter_annotation.Utils;
-
-import java.util.Map;
 
 /**
  * 作者：xjzhao
@@ -26,6 +25,7 @@ class Navigation {
     private static Application context;
     private static Handler handler;
     private Inner inner;
+    private boolean isInitFinished = false;
 
     public synchronized void init(Application application) {
         context = application;
@@ -39,6 +39,7 @@ class Navigation {
                 }
             }
         }));
+        isInitFinished = true;
     }
 
     public static Navigation getInstance(){
@@ -68,12 +69,7 @@ class Navigation {
     private <T> T parse(Context context, Params params, int requestCode, MRouterCallback callback){
         String[] result = Utils.getPath(params.getGroup(), params.getPath());
         if (null != result) {
-            Map<String, RouterMeta> routers = _MRouter.getInstance().getRouters();
-            Map<String, RouterMeta> jsons = _MRouter.getInstance().getSerializations();
-            RouterMeta meta = routers.get(result[1]);
-            if (null == meta){
-                meta = jsons.get(result[1]);
-            }
+            RouterMeta meta = _MRouter.getInstance().getRouterMeta(result[1]);
             if (null != meta){
                 params.setGroup(result[0]);
                 params.setPath(result[1]);
@@ -86,7 +82,9 @@ class Navigation {
 
     <T> T _go(final Context context, @NonNull final Params params, final int requestCode, final MRouterCallback callback){
         final Context currentContext = null == context ? Navigation.context : context;
-        switch (params.getType()) {
+        RouterType type = params.getType();
+        if (null == type) return null;
+        switch (type) {
             case TYPE_ACTIVITY:
                 final Intent intent = new Intent(currentContext, params.getDestination());
                 intent.putExtras(params.getExtras());
@@ -114,7 +112,7 @@ class Navigation {
                 });
 
                 break;
-            case TYPE_FTAGMENT:
+            case TYPE_FRAGMENT:
                 Class fragmentClss = params.getDestination();
                 try {
                     T instance = (T) fragmentClss.getConstructor().newInstance();
@@ -182,6 +180,9 @@ class Navigation {
         this.inner = inner;
     }
 
+    public boolean isInitFinished() {
+        return isInitFinished;
+    }
 
     class Inner {
         private Context context;

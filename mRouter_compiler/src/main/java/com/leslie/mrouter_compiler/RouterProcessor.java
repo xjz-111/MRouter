@@ -1,6 +1,7 @@
 package com.leslie.mrouter_compiler;
 
 import com.google.auto.service.AutoService;
+import com.leslie.mrouter_annotation.IInstance;
 import com.leslie.mrouter_annotation.IJson;
 import com.leslie.mrouter_annotation.IRouter;
 import com.leslie.mrouter_annotation.Router;
@@ -34,6 +35,14 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
+
+import static com.leslie.mrouter_annotation.Constant.FILE_NAME_START;
+import static com.leslie.mrouter_annotation.Constant.GENERATE_PACKAGER;
+import static com.leslie.mrouter_annotation.Constant.INSTANCE_FILE_NAME_START;
+import static com.leslie.mrouter_annotation.Constant.INSTANCE_PACKAGE_SUFFIX;
+import static com.leslie.mrouter_annotation.Constant.JSON_FILE_NAME_START;
+import static com.leslie.mrouter_annotation.Constant.JSON_PACKAGE_SUFFIX;
+import static com.leslie.mrouter_annotation.Constant.ROUTER_PACKAGE_SUFFIX;
 
 /**
  * 扫描路由注解，并生成相应代码
@@ -97,8 +106,11 @@ public class RouterProcessor extends AbstractProcessor {
 
         MethodSpec.Builder jsonMb = getMethodSpecBuilder();
 
+        MethodSpec.Builder instanceMb = getMethodSpecBuilder();
 
         RouterType type;
+        // 用三位表示三种类型是否存在
+        int temp = 0x000;
         for (Element element : elements) {
             String packageName = elementTool.getPackageOf(element).getQualifiedName().toString();
 
@@ -114,15 +126,17 @@ public class RouterProcessor extends AbstractProcessor {
 
             TypeMirror currentType = element.asType();
             boolean isJson = false;
+            boolean isInstance = false;
             if (typeTool.isSubtype(currentType, activityType)) {
                 type = RouterType.TYPE_ACTIVITY;
             } else if (typeTool.isSubtype(currentType, fragmentType) || typeTool.isSubtype(currentType, fragmentV4Type)) {
-                type = RouterType.TYPE_FTAGMENT;
+                type = RouterType.TYPE_FRAGMENT;
             } else if (typeTool.isSubtype(currentType, jsonType)) {
                 type = RouterType.TYPE_JSON;
                 isJson = true;
-            } else {
-                throw new AssertionError("仅支持Activity，Fragment和IProvider ！！！");
+            } else  {
+                type = RouterType.TYPE_INSTANCE;
+                isInstance = true;
             }
 
             print("被@Router注解的类有：" + packageName + "." + className);
@@ -130,19 +144,33 @@ public class RouterProcessor extends AbstractProcessor {
             // list中添加元素
             if (isJson) {
                 addStatement(jsonMb, "map.put(\"" + Constant.JSON_KEY + "\", $T.build(\"" + group + "\",\"" + path + "\"," + "$T." + type + ", $T.class" + "))", element);
+                temp = temp | 0x001;
+            } else if (isInstance){
+                addStatement(instanceMb, "map.put(\"" + path + "\", $T.build(\"" + group + "\",\"" + path + "\"," + "$T." + type + ", $T.class" + "))", element);
+                temp = temp | 0x010;
             }else {
                 addStatement(routerMb, "map.put(\"" + path + "\", $T.build(\"" + group + "\",\"" + path + "\"," + "$T." + type + ", $T.class" + "))", element);
+                temp = temp | 0x100;
             }
-
-
         }
 
-        // _MRouter$$Router$${moduleName}.class
-        generate(com.leslie.mrouter_annotation.Constant.FILE_NAME_START + moduleName, IRouter.class, routerMb.build());
-
         // _MRouter$$Json$$$${moduleName}.class
-        generate(com.leslie.mrouter_annotation.Constant.JSON_FILE_NAME_START + moduleName, IJson.class, jsonMb.build());
+        if (isIntNumberNBitONEInBinary(temp, 1)) generate(GENERATE_PACKAGER + "." + JSON_PACKAGE_SUFFIX, JSON_FILE_NAME_START + moduleName, IJson.class, jsonMb.build());
 
+        // _MRouter$$Instance$$$${moduleName}.class
+        if (isIntNumberNBitONEInBinary(temp, 2)) generate(GENERATE_PACKAGER + "." + INSTANCE_PACKAGE_SUFFIX, INSTANCE_FILE_NAME_START + moduleName, IInstance.class, instanceMb.build());
+
+        // _MRouter$$Router$${moduleName}.class
+        if (isIntNumberNBitONEInBinary(temp, 3)) generate(GENERATE_PACKAGER + "." + ROUTER_PACKAGE_SUFFIX, FILE_NAME_START + moduleName, IRouter.class, routerMb.build());
+
+    }
+
+    private boolean isIntNumberNBitONEInBinary(int number, int bit){
+        boolean result = false;
+        if((number % (Math.pow(16, bit)))/(Math.pow(16, bit - 1)) >= 1.0){
+            result = true;
+        }
+        return result;
     }
 
     private MethodSpec.Builder getMethodSpecBuilder(){
@@ -168,7 +196,8 @@ public class RouterProcessor extends AbstractProcessor {
                 ClassName.get((TypeElement) element));
     }
 
-    private void generate(String fileName, Class<?> superCls, MethodSpec methodSpec){
+    private void generate(String packageName, String fileName, Class<?> superCls, MethodSpec methodSpec){
+        print("MRouter::" + packageName + "packageName : " + packageName);
         TypeSpec _MRouter$$Router = TypeSpec.classBuilder(fileName)
                 .addSuperinterface(superCls)
                 .addModifiers(Modifier.PUBLIC)
@@ -176,17 +205,17 @@ public class RouterProcessor extends AbstractProcessor {
                 .build();
 
         try {
-            JavaFile javaFile = JavaFile.builder(com.leslie.mrouter_annotation.Constant.PACKAGE, _MRouter$$Router)
+            JavaFile javaFile = JavaFile.builder(packageName, _MRouter$$Router)
                     .addFileComment(" This codes are generated automatically. Do not modify!")
                     .build();
             // write to file
             javaFile.writeTo(filer);
 
-            messager.printMessage(Diagnostic.Kind.NOTE, "MRouter::代码已生成！");
+            print("MRouter::" + packageName + "代码已生成！");
 
         } catch (IOException e) {
             e.printStackTrace();
-            messager.printMessage(Diagnostic.Kind.NOTE, "MRouter::生成代码失败");
+            print("MRouter::" + packageName + "生成代码失败");
 
         }
     }
