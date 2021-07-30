@@ -15,7 +15,7 @@ public class TypeWrapper<T> {
         // 返回表示此Class所表示的实体（类、接口、基本类型或 void）的直接超类的Type - 超类的泛型如果有㛑会返回
         Type superClass = getClass().getGenericSuperclass();
 
-        // 获取泛型的Tyoe
+        // 获取泛型的Type
         type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
     }
 

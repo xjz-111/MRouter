@@ -113,9 +113,9 @@ class Navigation {
 
                 break;
             case TYPE_FRAGMENT:
-                Class fragmentClss = params.getDestination();
+                Class fragmentClass = params.getDestination();
                 try {
-                    T instance = (T) fragmentClss.getConstructor().newInstance();
+                    T instance = (T) fragmentClass.getConstructor().newInstance();
                     if (instance instanceof Fragment) {
                         ((Fragment) instance).setArguments(params.getExtras());
                     } else if (instance instanceof androidx.fragment.app.Fragment) {

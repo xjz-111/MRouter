@@ -139,7 +139,7 @@ public class RouterProcessor extends AbstractProcessor {
                 isInstance = true;
             }
 
-            print("被@Router注解的类有：" + packageName + "." + className);
+            print("被@Router注解的类有：" + packageName + "." + className + "  type : " + type.getType());
 
             // list中添加元素
             if (isJson) {
